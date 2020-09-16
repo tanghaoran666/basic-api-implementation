@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -95,6 +97,7 @@ class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(hasValue())
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
@@ -154,6 +157,17 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[1].keyWord",is("无参数")))
                 .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
                 .andExpect(jsonPath("$[2].keyWord",is("神秘")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void should_get_all_user() throws Exception {
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$.name",is("thr")))
+                .andExpect(jsonPath("$.age",is(19)))
+                .andExpect(jsonPath("$.gender",is("male")))
+                .andExpect(jsonPath("$.email",is("a@b.com")))
+                .andExpect(jsonPath("$.phone",is("18888888888")))
                 .andExpect(status().isOk());
     }
 }

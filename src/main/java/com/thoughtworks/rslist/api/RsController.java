@@ -16,13 +16,21 @@ import java.util.List;
 public class RsController {
 
   private List<RsEvent> rsList = initRsList();
-  private User user = new User("thr","male",19,"a@b.com","18888888888");
+//  private List<User> userList = initUsers();
+
+  User user = new User("thr","male",19,"a@b.com","18888888888");
   private List<RsEvent> initRsList() {
     List<RsEvent> rsEvents = new ArrayList<>();
-    rsEvents.add(new RsEvent("第一条事件","无参数",user));
+    rsEvents.add(new RsEvent("第一条事件","无参数", user));
     rsEvents.add(new RsEvent("第二条事件","无参数",user));
     rsEvents.add(new RsEvent("第三条事件","无参数",user));
     return rsEvents;
+  }
+
+  private List<User> initUsers(){
+    List<User> userList = new ArrayList<>();
+    userList.add(new User("thr","male",19,"a@b.com","18888888888"));
+    return userList;
   }
 
 
@@ -43,25 +51,36 @@ public class RsController {
   @PostMapping("/rs/event")
   public ResponseEntity postList(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
-    return ResponseEntity.created(null).build();
+    int index = rsList.indexOf(rsEvent);
+    return ResponseEntity.created(null).body(index);
   }
 
+  @GetMapping("/users")
+  public ResponseEntity getUserList(){
+    return ResponseEntity.ok(user);
+  }
 
   @PatchMapping("/rs/{index}")
-  public void patchListViaBody(@PathVariable int index,@RequestBody RsEvent rsEvent){
+  public ResponseEntity patchListViaBody(@PathVariable int index,@RequestBody RsEvent rsEvent){
     RsEvent patchRsEvent = rsList.get(index-1);
     if(rsEvent.getEventName() != null) patchRsEvent.setEventName(rsEvent.getEventName());
     if(rsEvent.getKeyWord() != null) patchRsEvent.setKeyWord(rsEvent.getKeyWord());
+    return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("/rs/{index}")
-  public void deleteList(@PathVariable int index){
+  public ResponseEntity deleteList(@PathVariable int index){
+
     rsList.remove(index-1);
+    return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("/rs/reStart")
-  public void reStart(){
+  public ResponseEntity reStart(){
     rsList.clear();
     rsList = initRsList();
+    return ResponseEntity.ok(null);
   }
+
+
 }
