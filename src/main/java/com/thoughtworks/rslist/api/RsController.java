@@ -102,5 +102,15 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
+  @ExceptionHandler({MethodArgumentNotValidException.class})
+  private ResponseEntity rsExceptionHandle(Exception e) {
+    Error error = new Error();
+
+    if(e instanceof MethodArgumentNotValidException){
+      error.setError("invalid param");
+    }
+    return ResponseEntity.badRequest().body(error);
+
+  }
 
 }

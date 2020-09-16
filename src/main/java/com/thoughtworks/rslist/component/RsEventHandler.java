@@ -10,15 +10,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class RsEventHandler {
-    @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({RsEventNotValidException.class})
     private ResponseEntity rsExceptionHandle(Exception e) {
         Error error = new Error();
 
-        if(e instanceof MethodArgumentNotValidException){
-            error.setError("invalid param");
-        }else {
-            error.setError(e.getMessage());
-        }
+
+        error.setError(e.getMessage());
+
         return ResponseEntity.badRequest().body(error);
 
     }
