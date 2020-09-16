@@ -16,7 +16,7 @@ import java.util.List;
 public class RsController {
 
   private List<RsEvent> rsList = initRsList();
-//  private List<User> userList = initUsers();
+  private List<User> userList = initUsers();
 
   User user = new User("thr","male",19,"a@b.com","18888888888");
   private List<RsEvent> initRsList() {
@@ -48,16 +48,16 @@ public class RsController {
     return ResponseEntity.ok(rsList.subList(start-1 , end));
   }
 
+  @GetMapping("/users")
+  public ResponseEntity getUserList(){
+    return ResponseEntity.ok(user);
+  }
+
   @PostMapping("/rs/event")
   public ResponseEntity postList(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
     int index = rsList.indexOf(rsEvent);
-    return ResponseEntity.created(null).body(index);
-  }
-
-  @GetMapping("/users")
-  public ResponseEntity getUserList(){
-    return ResponseEntity.ok(user);
+    return ResponseEntity.created(null).body(index+1);
   }
 
   @PatchMapping("/rs/{index}")
