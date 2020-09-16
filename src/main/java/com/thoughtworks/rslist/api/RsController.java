@@ -16,9 +16,16 @@ import java.util.List;
 public class RsController {
 
   private List<RsEvent> rsList = initRsList();
-  private List<User> userList = initUsers();
 
   User user = new User("thr","male",19,"a@b.com","18888888888");
+  private List<User> userList = initUserList();
+
+  private List<User> initUserList() {
+    List<User> userList = new ArrayList<>();
+    userList.add(new User("thr","male",19,"a@b.com","18888888888"));
+    return userList;
+  }
+
   private List<RsEvent> initRsList() {
     List<RsEvent> rsEvents = new ArrayList<>();
     rsEvents.add(new RsEvent("第一条事件","无参数", user));
@@ -50,7 +57,7 @@ public class RsController {
 
   @GetMapping("/users")
   public ResponseEntity getUserList(){
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(userList);
   }
 
   @PostMapping("/rs/event")

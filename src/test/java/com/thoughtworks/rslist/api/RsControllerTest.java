@@ -37,13 +37,13 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
                 .andExpect(jsonPath("$[2].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -163,11 +163,15 @@ class RsControllerTest {
     @Test
     public void should_get_all_user() throws Exception {
         mockMvc.perform(get("/users"))
-                .andExpect(jsonPath("$.name",is("thr")))
-                .andExpect(jsonPath("$.age",is(19)))
-                .andExpect(jsonPath("$.gender",is("male")))
-                .andExpect(jsonPath("$.email",is("a@b.com")))
-                .andExpect(jsonPath("$.phone",is("18888888888")))
+                .andExpect(jsonPath("$[0].name",is("thr")))
+                .andExpect(jsonPath("$[0].age",is(19)))
+                .andExpect(jsonPath("$[0].gender",is("male")))
+                .andExpect(jsonPath("$[0].email",is("a@b.com")))
+                .andExpect(jsonPath("$[0].phone",is("18888888888")))
                 .andExpect(status().isOk());
     }
+
+
+
+
 }
