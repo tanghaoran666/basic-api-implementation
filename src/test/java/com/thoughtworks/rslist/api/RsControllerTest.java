@@ -24,10 +24,10 @@ class RsControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-//    @BeforeEach
-//    void setUp() throws Exception {
-//        mockMvc.perform(delete("rs/reStart")).andExpect(status().isOk());
-//    }
+    @BeforeEach
+    void setUp() throws Exception {
+        mockMvc.perform(delete("/rs/reStart")).andExpect(status().isOk());
+    }
 
     @Test
     public void should_get_rs_event_list() throws Exception {

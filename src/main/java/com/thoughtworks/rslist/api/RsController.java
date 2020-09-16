@@ -59,7 +59,6 @@ public class RsController {
     RsEvent patchRsEvent = rsList.get(index-1);
     if(rsEvent.getEventName() != null) patchRsEvent.setEventName(rsEvent.getEventName());
     if(rsEvent.getKeyWord() != null) patchRsEvent.setKeyWord(rsEvent.getKeyWord());
-    rsList.set(index-1,patchRsEvent);
 
   }
 
