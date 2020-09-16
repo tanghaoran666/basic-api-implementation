@@ -35,13 +35,13 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
                 .andExpect(jsonPath("$[2].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
+//                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -156,4 +156,38 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[2].keyWord",is("神秘")))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void should_add_new_user_in_list() throws Exception {
+        User user = new User("abc","male",19,"a@b.com","18888888888");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$",hasSize(2)))
+                .andExpect(jsonPath("$[0].name",is("thr")))
+                .andExpect(jsonPath("$[0].age",is(19)))
+                .andExpect(jsonPath("$[1].name",is("abc")))
+                .andExpect(jsonPath("$[1].age",is(19)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void should_not_add_old_user_in_list() throws Exception {
+        User user = new User("thr","male",19,"a@b.com","18888888888");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$",hasSize(1)))
+                .andExpect(jsonPath("$[0].name",is("thr")))
+                .andExpect(jsonPath("$[0].age",is(19)))
+                .andExpect(status().isOk());
+    }
+
+
 }

@@ -16,6 +16,14 @@ import java.util.List;
 public class RsController {
 
   private List<RsEvent> rsList = initRsList();
+  private List<User> userList = initUserList();
+
+  private List<User> initUserList() {
+    List<User> userList = new ArrayList<>();
+    userList.add(new User("thr","male",19,"a@b.com","18888888888"));
+    return userList;
+  }
+
   private User user = new User("thr","male",19,"a@b.com","18888888888");
   private List<RsEvent> initRsList() {
     List<RsEvent> rsEvents = new ArrayList<>();
@@ -40,9 +48,20 @@ public class RsController {
     return ResponseEntity.ok(rsList.subList(start-1 , end));
   }
 
+  @GetMapping("/users")
+  public ResponseEntity getUsers(){
+    return ResponseEntity.ok(userList);
+  }
+
   @PostMapping("/rs/event")
   public ResponseEntity postList(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
+    for (User userInList : userList) {
+      if(userInList.getName().equals(rsEvent.getUser().getName())) {
+        return ResponseEntity.created(null).build();
+      }
+    }
+    userList.add(rsEvent.getUser());
     return ResponseEntity.created(null).build();
   }
 
