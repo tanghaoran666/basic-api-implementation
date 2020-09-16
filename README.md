@@ -1,4 +1,9 @@
-### 作业描述
+### 作业要求
+
+#### 在demo的基础上完成下面需求：
+
+
+ 
 
 #### 重复课堂上的Demo完成练习
 * 给所有接口添加错误处理：
@@ -9,6 +14,4 @@
     5. 先阅读：https://www.baeldung.com/spring-boot-logging
        在我们的exceptionHandler中添加日志，记录下错误的信息（error级别），运行程序试着观察是否有日志打印
 * 先写测试（除了日志）！
-
-<span style="color: red"> 注意：最终需要将改动合并到master分支 </span> 
 
