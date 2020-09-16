@@ -1,11 +1,11 @@
 package com.thoughtworks.rslist.api;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,13 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无参数")))
+                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("无参数")))
+                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
                 .andExpect(jsonPath("$[2].keyWord",is("无参数")))
+                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -87,12 +90,12 @@ class RsControllerTest {
 
     @Test
     public void should_add_rs_event_list() throws Exception {
-//        String jsonString = "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\"}";
-        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济");
+        User user = new User("thr","male",18,"a@b.com","18888888888");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",user);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$",hasSize(4)))
@@ -126,41 +129,15 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    public void should_change_rs_event_list()throws Exception{
-//        mockMvc.perform(patch("/rs/1/?eventName=美国山火&keyWord=国际"))
-//                .andExpect(status().isOk());
-//        mockMvc.perform(get("/rs/1"))
-//                .andExpect(jsonPath("$.eventName",is("美国山火")))
-//                .andExpect(jsonPath("$.keyWord",is("国际")))
-//                .andExpect(status().isOk());
-//
-//
-//        mockMvc.perform(patch("/rs/2/?eventName=新冠疫苗"))
-//                .andExpect(status().isOk());
-//        mockMvc.perform(patch("/rs/3/?keyWord=神秘"))
-//                .andExpect(status().isOk());
-//
-//        mockMvc.perform(get("/rs/list"))
-//                .andExpect(jsonPath("$",hasSize(3)))
-//                .andExpect(jsonPath("$[0].eventName",is("美国山火")))
-//                .andExpect(jsonPath("$[0].keyWord",is("国际")))
-//                .andExpect(jsonPath("$[1].eventName",is("新冠疫苗")))
-//                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-//                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-//                .andExpect(jsonPath("$[2].keyWord",is("神秘")))
-//                .andExpect(status().isOk());
-//
-//    }
 
     @Test
     public void should_change_rs_event_list_via_body()throws Exception{
 
         ObjectMapper objectMapper = new ObjectMapper();
-
-        String jsonString1 = objectMapper.writeValueAsString(new RsEvent("美国山火","国际"));
-        String jsonString2 = objectMapper.writeValueAsString(new RsEvent("新冠疫苗",null));
-        String jsonString3 = objectMapper.writeValueAsString(new RsEvent(null,"神秘"));
+        User user = new User("thr","male",19,"a@b.com","18888888888");
+        String jsonString1 = objectMapper.writeValueAsString(new RsEvent("美国山火","国际",user));
+        String jsonString2 = objectMapper.writeValueAsString(new RsEvent("新冠疫苗",null,user));
+        String jsonString3 = objectMapper.writeValueAsString(new RsEvent(null,"神秘",user));
 
         mockMvc.perform(patch("/rs/1").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

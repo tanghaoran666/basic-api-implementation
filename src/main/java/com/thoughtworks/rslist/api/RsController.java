@@ -1,7 +1,9 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.User;
 import org.hibernate.annotations.Parameter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.xml.soap.SAAJResult;
@@ -14,52 +16,42 @@ import java.util.List;
 public class RsController {
 
   private List<RsEvent> rsList = initRsList();
-
+  private User user = new User("thr","male",19,"a@b.com","18888888888");
   private List<RsEvent> initRsList() {
     List<RsEvent> rsEvents = new ArrayList<>();
-    rsEvents.add(new RsEvent("第一条事件","无参数"));
-    rsEvents.add(new RsEvent("第二条事件","无参数"));
-    rsEvents.add(new RsEvent("第三条事件","无参数"));
+    rsEvents.add(new RsEvent("第一条事件","无参数",user));
+    rsEvents.add(new RsEvent("第二条事件","无参数",user));
+    rsEvents.add(new RsEvent("第三条事件","无参数",user));
     return rsEvents;
   }
 
 
 
   @GetMapping("/rs/{index}")
-  public RsEvent getOneList(@PathVariable int index){
-
-    return rsList.get(index - 1);
+  public ResponseEntity getOneList(@PathVariable int index){
+    return ResponseEntity.ok(rsList.get(index - 1));
   }
 
   @GetMapping("/rs/list")
-  public List<RsEvent> getBetweenList(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
+  public ResponseEntity getBetweenList(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if(start == null || end == null){
-      return rsList;
+      return ResponseEntity.ok(rsList);
     }
-    return rsList.subList(start-1 , end);
+    return ResponseEntity.ok(rsList.subList(start-1 , end));
   }
 
   @PostMapping("/rs/event")
-  public void postList(@RequestBody RsEvent rsEvent){
-
+  public ResponseEntity postList(@RequestBody RsEvent rsEvent){
     rsList.add(rsEvent);
+    return ResponseEntity.created(null).build();
   }
 
-//  @PatchMapping("/rs/{index}")
-//  public void patchList(@PathVariable int index,@RequestParam(required = false) String eventName,@RequestParam(required = false) String keyWord){
-//    RsEvent patchRsEvent = rsList.get(index-1);
-//    if(eventName != null) patchRsEvent.setEventName(eventName);
-//    if(keyWord != null) patchRsEvent.setKeyWord(keyWord);
-//    rsList.set(index-1,patchRsEvent);
-//
-//  }
 
   @PatchMapping("/rs/{index}")
   public void patchListViaBody(@PathVariable int index,@RequestBody RsEvent rsEvent){
     RsEvent patchRsEvent = rsList.get(index-1);
     if(rsEvent.getEventName() != null) patchRsEvent.setEventName(rsEvent.getEventName());
     if(rsEvent.getKeyWord() != null) patchRsEvent.setKeyWord(rsEvent.getKeyWord());
-
   }
 
   @DeleteMapping("/rs/{index}")
