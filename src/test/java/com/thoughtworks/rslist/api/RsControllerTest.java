@@ -179,5 +179,16 @@ class RsControllerTest {
 
     }
 
+    @Test
+    public  void should_throw_exception_when_method_not_valid_param() throws Exception {
+        User user = new User("thrxxxxxx","male",18,"a@b.com","18888888888");
+        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",user);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error",is("invalid param")))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }

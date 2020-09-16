@@ -6,8 +6,11 @@ import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import org.hibernate.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import lombok.Data;
+
+import javax.validation.Valid;
 import javax.xml.soap.SAAJResult;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +69,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity postList(@RequestBody RsEvent rsEvent){
+  public ResponseEntity postList(@RequestBody @Valid RsEvent rsEvent){
     rsList.add(rsEvent);
     int index = rsList.indexOf(rsEvent);
     return ResponseEntity.created(null).body(index+1);
@@ -94,11 +97,5 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
-  @ExceptionHandler(RsEventNotValidException.class)
-  private ResponseEntity rsExceptionHandle(RsEventNotValidException e) {
-    Error error = new Error();
-    error.setError(e.getMessage());
-    return ResponseEntity.badRequest().body(error);
 
-  }
 }
