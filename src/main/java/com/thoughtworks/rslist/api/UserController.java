@@ -25,14 +25,4 @@ public class UserController {
         return userList;
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class})
-    private ResponseEntity rsExceptionHandle(Exception e) {
-        Error error = new Error();
-
-        if(e instanceof MethodArgumentNotValidException){
-            error.setError("invalid user");
-        }
-        return ResponseEntity.badRequest().body(error);
-
-    }
 }
