@@ -41,9 +41,9 @@ class UserControllerTest {
     @Test
     @Order(1)
     public void should_add_user() throws Exception {
-        User user = new User("thr","male",18,"a@b.com","18888888888");
-        String jsonString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/user/").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         List<UserPo> all = userRepository.findAll();
         assertEquals(1,all.size());
@@ -53,10 +53,9 @@ class UserControllerTest {
     @Test
     @Order(2)
     public void name_should_less_than_8() throws Exception {
-        User user = new User("thasddssr","male",18,"a@b.com","18888888888");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/user/").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thrxxxxxx").gender("male").email("a@b.com").age(18).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error",is("invalid user")))
                 .andExpect(status().isBadRequest());
 
@@ -65,10 +64,9 @@ class UserControllerTest {
     @Test
     @Order(3)
     public void age_should_less_100_and_more_18() throws Exception {
-        User user = new User("thr","male",15,"a@b.com","18888888888");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/user/").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(15).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error",is("invalid user")))
                 .andExpect(status().isBadRequest());
     }
@@ -76,10 +74,9 @@ class UserControllerTest {
     @Test
     @Order(4)
     public void email_should_format_pattern() throws Exception {
-        User user = new User("thr","male",19,"ab.com","18888888888");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/user/").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("ab.com").age(18).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error",is("invalid user")))
                 .andExpect(status().isBadRequest());
     }
@@ -87,11 +84,41 @@ class UserControllerTest {
     @Test
     @Order(5)
     public void phone_should_format_pattern() throws Exception {
-        User user = new User("thr","male",19,"a@b.com","188888888881");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(user);
-        mockMvc.perform(post("/user/").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        UserPo userPo = UserPo.builder().phone("188888888881").name("thr").gender("male").email("a@b.com").age(18).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error",is("invalid user")))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Order(6)
+    public void should_get_user_in_data_base() throws Exception {
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        List<UserPo> all = userRepository.findAll();
+        assertEquals(1,all.size());
+        assertEquals("thr",all.get(0).getName());
+        assertEquals("a@b.com",all.get(0).getEmail());
+
+        mockMvc.perform(get("/user/1"))
+                .andExpect(jsonPath("$.name",is("thr")))
+                .andExpect(jsonPath("$.gender",is("male")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @Order(7)
+    public void should_delete_user_in_database() throws Exception {
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
+        String jsonString = objectMapper.writeValueAsString(userPo);
+        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/user/1"))
+                .andExpect(status().isOk());
+        List<UserPo> all = userRepository.findAll();
+        assertEquals(2,all.size());
     }
 }

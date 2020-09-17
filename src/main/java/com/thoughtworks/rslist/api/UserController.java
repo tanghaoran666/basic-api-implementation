@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
@@ -20,13 +21,21 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/user/")
-    public void add_user_list(@RequestBody @Valid User user){
-        UserPo build = UserPo.builder().age(user.getAge()).email(user.getEmail()).gender(user.getGender())
-                .name(user.getName()).phone(user.getPhone()).build();
-
-        userRepository.save(build);
+    @PostMapping("/user")
+    public void add_user_list(@RequestBody @Valid UserPo userPo){
+        userRepository.save(userPo);
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity get_user_in_database(@PathVariable int id){
+        UserPo userPo = userRepository.findOneById(id);
+        return ResponseEntity.ok(userPo);
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity delete_user_in_database(@PathVariable int id){
+        userRepository.deleteById(id);
+        return ResponseEntity.ok(null);
+    }
 
 }

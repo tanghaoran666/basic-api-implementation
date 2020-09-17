@@ -4,6 +4,7 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
+import com.thoughtworks.rslist.po.UserPo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class RsEventHandler {
         else if (e instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException methodArgumentNotValidException = (MethodArgumentNotValidException) e;
 
-            if(methodArgumentNotValidException.getBindingResult().getTarget() instanceof User) {
+            if(methodArgumentNotValidException.getBindingResult().getTarget() instanceof UserPo) {
                 error.setError("invalid user");
             }else if (methodArgumentNotValidException.getBindingResult().getTarget() instanceof RsEvent){
                 error.setError("invalid param");
