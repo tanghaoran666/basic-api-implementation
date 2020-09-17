@@ -4,7 +4,11 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
+import com.thoughtworks.rslist.po.RsEventPo;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import org.hibernate.annotations.Parameter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -20,30 +24,15 @@ import java.util.List;
 
 public class RsController {
 
-  private List<RsEvent> rsList = initRsList();
+  @Autowired
+  RsEventRepository rsEventRepository;
+  @Autowired
+  UserRepository userRepository;
 
-  User user = new User("thr","male",19,"a@b.com","18888888888");
-  private List<User> userList = initUserList();
 
-  private List<User> initUserList() {
-    List<User> userList = new ArrayList<>();
-    userList.add(new User("thr","male",19,"a@b.com","18888888888"));
-    return userList;
-  }
+  List<RsEvent> rsList;
+  List<User> userList;
 
-  private List<RsEvent> initRsList() {
-    List<RsEvent> rsEvents = new ArrayList<>();
-    rsEvents.add(new RsEvent("第一条事件","无参数", user));
-    rsEvents.add(new RsEvent("第二条事件","无参数",user));
-    rsEvents.add(new RsEvent("第三条事件","无参数",user));
-    return rsEvents;
-  }
-
-  private List<User> initUsers(){
-    List<User> userList = new ArrayList<>();
-    userList.add(new User("thr","male",19,"a@b.com","18888888888"));
-    return userList;
-  }
 
 
 
@@ -74,10 +63,12 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity postList(@RequestBody @Valid RsEvent rsEvent){
-    rsList.add(rsEvent);
-    int index = rsList.indexOf(rsEvent);
-    return ResponseEntity.created(null).body(index+1);
+  public ResponseEntity postList(@RequestBody @Valid RsEventPo rsEventPo){
+    if(!userRepository.findById(rsEventPo.getUserId()).isPresent()){
+      return ResponseEntity.badRequest().build();
+    }
+    RsEventPo savedRsEvent = rsEventRepository.save(rsEventPo);
+    return ResponseEntity.created(null).build();
   }
 
   @PatchMapping("/rs/{index}")
@@ -98,7 +89,6 @@ public class RsController {
   @DeleteMapping("/rs/reStart")
   public ResponseEntity reStart(){
     rsList.clear();
-    rsList = initRsList();
     return ResponseEntity.ok(null);
   }
 
