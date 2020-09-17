@@ -1,11 +1,9 @@
 package com.thoughtworks.rslist.component;
 
-import com.thoughtworks.rslist.api.LoggingController;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +30,9 @@ public class RsEventHandler {
             }
 
          }
-//             Logger logger = LogManager.getLogger(LoggingController.class);
+        Logger logger = LogManager.getLogger(RsEventHandler.class);
 //        logger.catching(Level.ERROR,e);
-
+        logger.error("here is a error!"+e.getMessage());
         return ResponseEntity.badRequest().body(error);
 
     }
