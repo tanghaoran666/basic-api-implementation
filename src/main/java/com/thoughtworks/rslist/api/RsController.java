@@ -64,7 +64,7 @@ public class RsController {
 
   @PostMapping("/rs/event")
   public ResponseEntity postList(@RequestBody @Valid RsEventPo rsEventPo){
-    if(!userRepository.findById(rsEventPo.getUserId()).isPresent()){
+    if(!userRepository.findById(rsEventPo.getUserPo().getId()).isPresent()){
       return ResponseEntity.badRequest().build();
     }
     RsEventPo savedRsEvent = rsEventRepository.save(rsEventPo);

@@ -104,7 +104,7 @@ class RsControllerTest {
     public void should_add_rs_event_list_when_user_exist() throws Exception {
         UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
         UserPo savedUserPo = userRepository.save(userPo);
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userId(savedUserPo.getId()).build();
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userPo(savedUserPo).build();
         String jsonString = objectMapper.writeValueAsString(rsEventPo);
 
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -115,13 +115,14 @@ class RsControllerTest {
         assertEquals(1,all.size());
         assertEquals("猪肉涨价了",all.get(0).getEventName());
         assertEquals("经济",all.get(0).getKeyWord());
-        assertEquals(savedUserPo.getId(),all.get(0).getUserId());
+        assertEquals(savedUserPo.getId(),all.get(0).getUserPo().getId());
 
     }
 
     @Test
-    public void should_add_rs_event_list_when_user_not_exist() throws Exception {
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userId(100).build();
+    public void should_throw_exception_add_rs_event_list_when_user_not_exist() throws Exception {
+        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).id(100).build();
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userPo(userPo).build();
         String jsonString = objectMapper.writeValueAsString(rsEventPo);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());

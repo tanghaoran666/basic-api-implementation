@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -33,4 +34,7 @@ public class UserPo {
     @Pattern(regexp = "^1\\d{10}")
     private String phone;
     private int voteNumber=10;
+
+    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "userPo")
+    private List<RsEventPo> rsEventPos;
 }
