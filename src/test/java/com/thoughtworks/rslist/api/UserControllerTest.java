@@ -33,7 +33,7 @@ class UserControllerTest {
     UserRepository userRepository;
     @BeforeEach
     public void setUp(){
-        userRepository.deleteAll();
+//        userRepository.deleteAll();
         objectMapper = new ObjectMapper();
     }
 
@@ -99,7 +99,7 @@ class UserControllerTest {
         mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         List<UserPo> all = userRepository.findAll();
-        assertEquals(1,all.size());
+        assertEquals(2,all.size());
         assertEquals("thr",all.get(0).getName());
         assertEquals("a@b.com",all.get(0).getEmail());
 
