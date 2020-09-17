@@ -33,7 +33,7 @@ class UserControllerTest {
     UserRepository userRepository;
     @BeforeEach
     public void setUp(){
-//        userRepository.deleteAll();
+        userRepository.deleteAll();
         objectMapper = new ObjectMapper();
     }
 
@@ -94,16 +94,8 @@ class UserControllerTest {
     @Test
     @Order(6)
     public void should_get_user_in_data_base() throws Exception {
-        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).build();
-        String jsonString = objectMapper.writeValueAsString(userPo);
-        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        List<UserPo> all = userRepository.findAll();
-        assertEquals(2,all.size());
-        assertEquals("thr",all.get(0).getName());
-        assertEquals("a@b.com",all.get(0).getEmail());
-
-        mockMvc.perform(get("/user/1"))
+        UserPo savedUserPo = userRepository.save(UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).build());
+        mockMvc.perform(get("/user/{id}",savedUserPo.getId()))
                 .andExpect(jsonPath("$.name",is("thr")))
                 .andExpect(jsonPath("$.gender",is("male")))
                 .andExpect(status().isOk());
@@ -112,13 +104,10 @@ class UserControllerTest {
     @Test
     @Order(7)
     public void should_delete_user_in_database() throws Exception {
-        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
-        String jsonString = objectMapper.writeValueAsString(userPo);
-        mockMvc.perform(post("/user").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(delete("/user/1"))
+        UserPo savedUserPo = userRepository.save(UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build());
+        mockMvc.perform(delete("/user/{id}",savedUserPo.getId()))
                 .andExpect(status().isOk());
         List<UserPo> all = userRepository.findAll();
-        assertEquals(2,all.size());
+        assertEquals(0,all.size());
     }
 }
