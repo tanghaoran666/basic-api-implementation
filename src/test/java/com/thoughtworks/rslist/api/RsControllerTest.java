@@ -37,7 +37,8 @@ class RsControllerTest {
     ObjectMapper objectMapper;
     @BeforeEach
     void setUp() throws Exception {
-//        mockMvc.perform(delete("/rs/reStart")).andExpect(status().isOk());
+        userRepository.deleteAll();
+        rsEventRepository.deleteAll();
         objectMapper = new ObjectMapper();
     }
 
@@ -147,15 +148,15 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-
+    //refactory 9.17
     @Test
     public void should_change_rs_event_list_via_body()throws Exception{
 
         ObjectMapper objectMapper = new ObjectMapper();
         User user = new User("thr","male",19,"a@b.com","18888888888");
-        String jsonString1 = objectMapper.writeValueAsString(new RsEvent("美国山火","国际",user));
-        String jsonString2 = objectMapper.writeValueAsString(new RsEvent("新冠疫苗",null,user));
-        String jsonString3 = objectMapper.writeValueAsString(new RsEvent(null,"神秘",user));
+        String jsonString1 = objectMapper.writeValueAsString(new RsEvent("美国山火","国际",1));
+        String jsonString2 = objectMapper.writeValueAsString(new RsEvent("新冠疫苗",null,1));
+        String jsonString3 = objectMapper.writeValueAsString(new RsEvent(null,"神秘",1));
 
         mockMvc.perform(patch("/rs/1").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -197,7 +198,7 @@ class RsControllerTest {
     @Test
     public  void should_throw_exception_when_method_not_valid_param() throws Exception {
         User user = new User("thrxxxxxx","male",18,"a@b.com","18888888888");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",user);
+        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",1);
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))

@@ -9,21 +9,22 @@ public class RsEvent {
     private String eventName;
     private String keyWord;
     @Valid
-    private User user;
+    private int userId;
 
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 //    @JsonIgnore
-    public User getUser() {
-        return user;
-    }
 //    @JsonProperty
-    public void setUser(User user) {
-        this.user = user;
-    }
 
-    public RsEvent(String eventName, String value, User user) {
+    public RsEvent(String eventName, String value, int userId) {
         this.eventName = eventName;
         this.keyWord = value;
-        this.user = user;
+        this.userId = userId;
     }
 
 

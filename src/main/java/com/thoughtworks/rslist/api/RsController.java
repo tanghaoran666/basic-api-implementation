@@ -30,18 +30,16 @@ public class RsController {
   UserRepository userRepository;
 
 
-  List<RsEvent> rsList;
-  List<User> userList;
 
 
 
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getOneList(@PathVariable int index){
-    if(index <=0 || index>rsList.size()){
+    if(index <=0 || index>rsEventRepository.findAll().size()){
       throw new RsEventNotValidException("invalid index");
     }
-    return ResponseEntity.ok(rsList.get(index - 1));
+    return ResponseEntity.ok(rsEventRepository.findAll().get(index - 1));
   }
 
   @GetMapping("/rs/list")
@@ -49,17 +47,17 @@ public class RsController {
 
 
     if(start == null || end == null){
-      return ResponseEntity.ok(rsList);
+      return ResponseEntity.ok(rsEventRepository.findAll());
     }
-    if(start<=0 || end > rsList.size() || start>end){
+    if(start<=0 || end > rsEventRepository.findAll().size() || start>end){
       throw new RsEventNotValidException("invalid request param");
     }
-    return ResponseEntity.ok(rsList.subList(start-1 , end));
+    return ResponseEntity.ok(rsEventRepository.findAll().subList(start-1 , end));
   }
 
   @GetMapping("/users")
   public ResponseEntity getUserList(){
-    return ResponseEntity.ok(userList);
+    return ResponseEntity.ok(rsEventRepository.findAll());
   }
 
   @PostMapping("/rs/event")
@@ -71,24 +69,36 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PatchMapping("/rs/{index}")
-  public ResponseEntity patchListViaBody(@PathVariable int index,@RequestBody RsEvent rsEvent){
-    RsEvent patchRsEvent = rsList.get(index-1);
-    if(rsEvent.getEventName() != null) patchRsEvent.setEventName(rsEvent.getEventName());
-    if(rsEvent.getKeyWord() != null) patchRsEvent.setKeyWord(rsEvent.getKeyWord());
+  @PatchMapping("/rs/{eventId}")
+  public ResponseEntity patchListViaBody(@PathVariable int eventId,@RequestBody RsEvent rsEvent){
+    if(!rsEventRepository.findById(eventId).isPresent()){
+      return ResponseEntity.badRequest().build();
+    }
+    int userId = rsEvent.getUserId();
+    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
+
+    if(userId!= rsEventPo.getUserPo().getId()){
+      return ResponseEntity.badRequest().build();
+    }
+    if(rsEvent.getKeyWord()!=null){
+      rsEventPo.setKeyWord(rsEvent.getKeyWord());
+    }
+    if(rsEvent.getEventName()!=null){
+      rsEventPo.setEventName(rsEvent.getEventName());
+    }
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("/rs/{index}")
-  public ResponseEntity deleteList(@PathVariable int index){
+  public ResponseEntity deleteList(@PathVariable int id){
 
-    rsList.remove(index-1);
+    rsEventRepository.deleteById(id);
     return ResponseEntity.ok(null);
   }
 
   @DeleteMapping("/rs/reStart")
   public ResponseEntity reStart(){
-    rsList.clear();
+    rsEventRepository.deleteAll();
     return ResponseEntity.ok(null);
   }
 

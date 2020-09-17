@@ -38,6 +38,7 @@ class UserControllerTest {
     @BeforeEach
     public void setUp(){
         userRepository.deleteAll();
+        rsEventRepository.deleteAll();
         objectMapper = new ObjectMapper();
     }
 
