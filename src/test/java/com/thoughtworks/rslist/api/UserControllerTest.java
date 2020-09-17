@@ -8,7 +8,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.po.RsEventPo;
 import com.thoughtworks.rslist.po.UserPo;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ class UserControllerTest {
     MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
     @BeforeEach
     public void setUp(){
         userRepository.deleteAll();
@@ -105,9 +109,13 @@ class UserControllerTest {
     @Order(7)
     public void should_delete_user_in_database() throws Exception {
         UserPo savedUserPo = userRepository.save(UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build());
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("涨工资了").keyWord("经济")
+                .userPo(savedUserPo).build();
+        rsEventRepository.save(rsEventPo);
+        assertEquals(1,rsEventRepository.findAll().size());
         mockMvc.perform(delete("/user/{id}",savedUserPo.getId()))
                 .andExpect(status().isOk());
-        List<UserPo> all = userRepository.findAll();
-        assertEquals(0,all.size());
+        assertEquals(0,userRepository.findAll().size());
+        assertEquals(0,rsEventRepository.findAll().size());
     }
 }
