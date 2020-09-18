@@ -76,18 +76,20 @@ class RsControllerTest {
 
     @Test
     public  void should_get_one_rs_event() throws Exception {
-        mockMvc.perform(get("/rs/1"))
+        RsEventPo rsEventPo1 = RsEventPo.builder().eventName("第一条事件").keyWord("无参数").userPo(userPo).build();
+        RsEventPo savedRsEventPo1 = rsEventRepository.save(rsEventPo1);
+        RsEventPo rsEventPo2 = RsEventPo.builder().eventName("第二条事件").keyWord("无参数").userPo(userPo).build();
+        RsEventPo savedRsEventPo2 = rsEventRepository.save(rsEventPo2);
+
+        mockMvc.perform(get("/rs/{id}",savedRsEventPo1.getId()))
                 .andExpect(jsonPath("$.eventName",is("第一条事件")))
                 .andExpect(jsonPath("$.keyWord",is("无参数")))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/2"))
+        mockMvc.perform(get("/rs/{id}",savedRsEventPo2.getId()))
                 .andExpect(jsonPath("$.eventName",is("第二条事件")))
                 .andExpect(jsonPath("$.keyWord",is("无参数")))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/3"))
-                .andExpect(jsonPath("$.eventName",is("第三条事件")))
-                .andExpect(jsonPath("$.keyWord",is("无参数")))
-                .andExpect(status().isOk());
+
     }
 
 
@@ -167,7 +169,7 @@ class RsControllerTest {
     public void should_throw_exceptin_when_index_out_of_range() throws Exception {
         mockMvc.perform(get("/rs/0"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid index")));
+                .andExpect(jsonPath("$.error",is("invalid id")));
 
     }
 

@@ -20,6 +20,7 @@ import javax.xml.soap.SAAJResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,12 +33,21 @@ public class RsController {
   UserRepository userRepository;
 
 
-  @GetMapping("/rs/{index}")
-  public ResponseEntity getOneList(@PathVariable int index){
-    if(index <=0 || index>rsEventRepository.findAll().size()){
-      throw new RsEventNotValidException("invalid index");
+  @GetMapping("/rs/{id}")
+  public ResponseEntity getOneList(@PathVariable int id){
+    Optional<RsEventPo> existPo = rsEventRepository.findById(id);
+    if(!existPo.isPresent()){
+      throw new RsEventNotValidException("invalid id");
     }
-    return ResponseEntity.ok(rsEventRepository.findAll().get(index - 1));
+    RsEventPo rsEventPo = existPo.get();
+    RsEvent rsEvent = RsEvent.builder()
+            .userId(rsEventPo.getId())
+            .keyWord(rsEventPo.getKeyWord())
+            .eventName(rsEventPo.getEventName())
+            .rsEventId(rsEventPo.getId())
+            .voteNum(rsEventPo.getVoteNum())
+            .build();
+    return ResponseEntity.ok(rsEvent);
   }
 
   @GetMapping("/rs/list")
