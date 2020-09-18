@@ -1,32 +1,31 @@
 package com.thoughtworks.rslist.po;
 
-import com.thoughtworks.rslist.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "rsEvent")
+@Table(name = "vote")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RsEventPo {
-
+public class VotePo {
     @Id
     @GeneratedValue
     private int id;
-    @NotNull
-    private String eventName;
-    @NotNull
-    private String keyWord;
-    @NotNull
+
+    private LocalDateTime localDateTime;
     private int voteNum;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private UserPo userPo;
+
+    @ManyToOne
+    @JoinColumn(name = "rs_event_id")
+    private RsEventPo rsEventPo;
 }

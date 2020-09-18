@@ -135,7 +135,7 @@ class RsControllerTest {
     public void should_change_rs_event_list_via_body()throws Exception{
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId()));
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId(),savedRsEventPo.getId(),5));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         RsEventPo rsEventPoChanged = rsEventRepository.findById(savedRsEventPo.getId()).get();
@@ -150,7 +150,7 @@ class RsControllerTest {
         UserPo savedUserPo = userRepository.save(userPo);
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100));
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100,savedRsEventPo.getId(),10));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -174,16 +174,6 @@ class RsControllerTest {
 
     }
 
-    @Test
-    public  void should_throw_exception_when_method_not_valid_param() throws Exception {
-        User user = new User("thrxxxxxx","male",18,"a@b.com","18888888888");
-        RsEvent rsEvent = new RsEvent("猪肉涨价了","经济",1);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(rsEvent);
-        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error",is("invalid param")))
-                .andExpect(status().isBadRequest());
-    }
 
     @Test
     public void should_throw_exception_when_given_not_valid_request_param() throws Exception {
