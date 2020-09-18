@@ -35,26 +35,37 @@ class RsControllerTest {
     RsEventRepository rsEventRepository;
 
     ObjectMapper objectMapper;
+    UserPo userPo;
+
     @BeforeEach
     void setUp() throws Exception {
         userRepository.deleteAll();
         rsEventRepository.deleteAll();
         objectMapper = new ObjectMapper();
+        userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
+        userPo = userRepository.save(userPo);
     }
 
     @Test
     public void should_get_rs_event_list() throws Exception {
+
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$",hasSize(3)))
+                .andExpect(jsonPath("$",hasSize(1)))
+                .andExpect(jsonPath("$[0].eventName",is("美国山火")))
+                .andExpect(jsonPath("$[0].keyWord",is("国际")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public  void  should_get_rs_event_list_between() throws Exception {
+        mockMvc.perform(get("/rs/list/?start=1&end=2"))
+                .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-//                .andExpect(jsonPath("$[0]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-//                .andExpect(jsonPath("$[1]",not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("无参数")))
-//                .andExpect(jsonPath("$[2]",not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -74,38 +85,11 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    public  void  should_get_rs_event_list_between() throws Exception {
-        mockMvc.perform(get("/rs/list/?start=1&end=2"))
-                .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list/?start=2&end=3"))
-                .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].eventName",is("第二条事件")))
-                .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list/?start=1&end=3"))
-                .andExpect(jsonPath("$",hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("无参数")))
-                .andExpect(status().isOk());
-    }
+
 
     @Test
     public void should_add_rs_event_list_when_user_exist() throws Exception {
-        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
-        UserPo savedUserPo = userRepository.save(userPo);
-        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(savedUserPo.getId()).build();
+        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(userPo.getId()).build();
         String jsonString = objectMapper.writeValueAsString(rsEvent);
 
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -116,7 +100,7 @@ class RsControllerTest {
         assertEquals(1,all.size());
         assertEquals("猪肉涨价了",all.get(0).getEventName());
         assertEquals("经济",all.get(0).getKeyWord());
-        assertEquals(savedUserPo.getId(),all.get(0).getUserPo().getId());
+        assertEquals(userPo.getId(),all.get(0).getUserPo().getId());
 
     }
 
@@ -147,14 +131,11 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-    //refactory 9.17
     @Test
     public void should_change_rs_event_list_via_body()throws Exception{
-        UserPo userPo = UserPo.builder().phone("18888888888").name("改事件").gender("male").email("a@b.com").age(18).voteNumber(10).build();
-        UserPo savedUserPo = userRepository.save(userPo);
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,savedUserPo.getId()));
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId()));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         RsEventPo rsEventPoChanged = rsEventRepository.findById(savedRsEventPo.getId()).get();
@@ -164,7 +145,7 @@ class RsControllerTest {
     }
 
     @Test
-    public void should_throw_exception_change_rs_event_list_when_suerid_not_match()throws Exception{
+    public void should_throw_exception_change_rs_event_list_when_uerid_not_match()throws Exception{
         UserPo userPo = UserPo.builder().phone("18888888888").name("改事件").gender("male").email("a@b.com").age(18).voteNumber(10).build();
         UserPo savedUserPo = userRepository.save(userPo);
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();

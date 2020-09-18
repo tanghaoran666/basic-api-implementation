@@ -20,6 +20,7 @@ import javax.xml.soap.SAAJResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 
@@ -29,10 +30,6 @@ public class RsController {
   RsEventRepository rsEventRepository;
   @Autowired
   UserRepository userRepository;
-
-
-
-
 
 
   @GetMapping("/rs/{index}")
@@ -45,15 +42,20 @@ public class RsController {
 
   @GetMapping("/rs/list")
   public ResponseEntity getBetweenList(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
+    List<RsEvent> rsEvents = rsEventRepository.findAll().stream().map(
+            item -> RsEvent.builder().keyWord(item.getKeyWord())
+                    .eventName(item.getEventName())
+                    .userId(item.getUserPo().getId()).build()
+    ).collect(Collectors.toList());
 
 
     if(start == null || end == null){
-      return ResponseEntity.ok(rsEventRepository.findAll());
+      return ResponseEntity.ok(rsEvents);
     }
     if(start<=0 || end > rsEventRepository.findAll().size() || start>end){
       throw new RsEventNotValidException("invalid request param");
     }
-    return ResponseEntity.ok(rsEventRepository.findAll().subList(start-1 , end));
+    return ResponseEntity.ok(rsEvents.subList(start-1 , end));
   }
 
   @GetMapping("/users")
