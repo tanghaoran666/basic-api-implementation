@@ -105,8 +105,8 @@ class RsControllerTest {
     public void should_add_rs_event_list_when_user_exist() throws Exception {
         UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
         UserPo savedUserPo = userRepository.save(userPo);
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userPo(savedUserPo).build();
-        String jsonString = objectMapper.writeValueAsString(rsEventPo);
+        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(savedUserPo.getId()).build();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
 
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -122,9 +122,8 @@ class RsControllerTest {
 
     @Test
     public void should_throw_exception_add_rs_event_list_when_user_not_exist() throws Exception {
-        UserPo userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).id(100).build();
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("猪肉涨价了").keyWord("经济").userPo(userPo).build();
-        String jsonString = objectMapper.writeValueAsString(rsEventPo);
+        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(100).build();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -151,29 +150,28 @@ class RsControllerTest {
     //refactory 9.17
     @Test
     public void should_change_rs_event_list_via_body()throws Exception{
+        UserPo userPo = UserPo.builder().phone("18888888888").name("改事件").gender("male").email("a@b.com").age(18).voteNumber(10).build();
+        UserPo savedUserPo = userRepository.save(userPo);
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,savedUserPo.getId()));
+        mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        RsEventPo rsEventPoChanged = rsEventRepository.findById(savedRsEventPo.getId()).get();
+        assertEquals("改过的美国山火",rsEventPoChanged.getEventName());
+        assertEquals("国际",rsEventPoChanged.getKeyWord());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        User user = new User("thr","male",19,"a@b.com","18888888888");
-        String jsonString1 = objectMapper.writeValueAsString(new RsEvent("美国山火","国际",1));
-        String jsonString2 = objectMapper.writeValueAsString(new RsEvent("新冠疫苗",null,1));
-        String jsonString3 = objectMapper.writeValueAsString(new RsEvent(null,"神秘",1));
+    }
 
-        mockMvc.perform(patch("/rs/1").content(jsonString1).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(patch("/rs/2").content(jsonString2).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        mockMvc.perform(patch("/rs/3").content(jsonString3).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$",hasSize(3)))
-                .andExpect(jsonPath("$[0].eventName",is("美国山火")))
-                .andExpect(jsonPath("$[0].keyWord",is("国际")))
-                .andExpect(jsonPath("$[1].eventName",is("新冠疫苗")))
-                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[2].eventName",is("第三条事件")))
-                .andExpect(jsonPath("$[2].keyWord",is("神秘")))
-                .andExpect(status().isOk());
+    @Test
+    public void should_throw_exception_change_rs_event_list_when_suerid_not_match()throws Exception{
+        UserPo userPo = UserPo.builder().phone("18888888888").name("改事件").gender("male").email("a@b.com").age(18).voteNumber(10).build();
+        UserPo savedUserPo = userRepository.save(userPo);
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100));
+        mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

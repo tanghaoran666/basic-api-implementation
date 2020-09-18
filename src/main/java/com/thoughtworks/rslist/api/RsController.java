@@ -5,6 +5,7 @@ import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.po.RsEventPo;
+import com.thoughtworks.rslist.po.UserPo;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.hibernate.annotations.Parameter;
@@ -61,11 +62,17 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity postList(@RequestBody @Valid RsEventPo rsEventPo){
-    if(!userRepository.findById(rsEventPo.getUserPo().getId()).isPresent()){
+  public ResponseEntity postList(@RequestBody @Valid RsEvent rsEvent){
+    if(!userRepository.findById(rsEvent.getUserId()).isPresent()){
       return ResponseEntity.badRequest().build();
     }
-    RsEventPo savedRsEvent = rsEventRepository.save(rsEventPo);
+    UserPo userPo = userRepository.findById(rsEvent.getUserId()).get();
+    RsEventPo rsEventPo = RsEventPo
+                                    .builder()
+                                    .keyWord(rsEvent.getKeyWord())
+                                    .eventName(rsEvent.getEventName())
+                                    .userPo(userPo).build();
+    rsEventRepository.save(rsEventPo);
     return ResponseEntity.created(null).build();
   }
 
@@ -86,6 +93,7 @@ public class RsController {
     if(rsEvent.getEventName()!=null){
       rsEventPo.setEventName(rsEvent.getEventName());
     }
+    rsEventRepository.save(rsEventPo);
     return ResponseEntity.ok(null);
   }
 
