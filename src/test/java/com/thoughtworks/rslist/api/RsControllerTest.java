@@ -60,6 +60,11 @@ class RsControllerTest {
 
     @Test
     public  void  should_get_rs_event_list_between() throws Exception {
+        RsEventPo rsEventPo1 = RsEventPo.builder().eventName("第一条事件").keyWord("无参数").userPo(userPo).build();
+        RsEventPo savedRsEventPo1 = rsEventRepository.save(rsEventPo1);
+        RsEventPo rsEventPo2 = RsEventPo.builder().eventName("第二条事件").keyWord("无参数").userPo(userPo).build();
+        RsEventPo savedRsEventPo2 = rsEventRepository.save(rsEventPo2);
+
         mockMvc.perform(get("/rs/list/?start=1&end=2"))
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
