@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "vote")
@@ -28,4 +29,6 @@ public class VotePo {
     @ManyToOne
     @JoinColumn(name = "rs_event_id")
     private RsEventPo rsEventPo;
+
+
 }

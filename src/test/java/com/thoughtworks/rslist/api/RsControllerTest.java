@@ -114,21 +114,13 @@ class RsControllerTest {
 
     @Test
     public void should_delete_rs_event_list()throws Exception {
-        mockMvc.perform(delete("/rs/3")).andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
-                .andExpect(jsonPath("$[1].keyWord",is("无参数")))
-                .andExpect(status().isOk());
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        assertEquals(1,rsEventRepository.findAll().size());
+        mockMvc.perform(delete("/rs/{id}",savedRsEventPo.getId())).andExpect(status().isOk());
+        assertEquals(0,rsEventRepository.findAll().size());
 
-        mockMvc.perform(delete("/rs/2")).andExpect(status().isOk());
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$",hasSize(1)))
-                .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
-                .andExpect(jsonPath("$[0].keyWord",is("无参数")))
-                .andExpect(status().isOk());
+
     }
 
     @Test

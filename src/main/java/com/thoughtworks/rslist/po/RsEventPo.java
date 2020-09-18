@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "rsEvent")
@@ -29,4 +30,7 @@ public class RsEventPo {
     private int voteNum;
     @ManyToOne
     private UserPo userPo;
+
+    @OneToMany(mappedBy = "rsEventPo")
+    private List<VotePo> votePos;
 }

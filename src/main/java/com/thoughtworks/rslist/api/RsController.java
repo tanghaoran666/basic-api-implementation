@@ -99,7 +99,7 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
-  @DeleteMapping("/rs/{index}")
+  @DeleteMapping("/rs/{id}")
   public ResponseEntity deleteList(@PathVariable int id){
 
     rsEventRepository.deleteById(id);

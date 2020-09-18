@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.po;
 
+import com.thoughtworks.rslist.domain.Vote;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,4 +38,7 @@ public class UserPo {
 
     @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "userPo")
     private List<RsEventPo> rsEventPos;
+
+    @OneToMany(mappedBy = "userPo")
+    private List<VotePo> votePos;
 }
