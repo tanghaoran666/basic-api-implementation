@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.po.RsEventPo;
 import com.thoughtworks.rslist.po.UserPo;
 import com.thoughtworks.rslist.repository.RsEventRepository;
@@ -18,6 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.security.PublicKey;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -94,22 +97,7 @@ class RsControllerTest {
 
 
 
-    @Test
-    public void should_add_rs_event_list_when_user_exist() throws Exception {
-        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(userPo.getId()).build();
-        String jsonString = objectMapper.writeValueAsString(rsEvent);
 
-        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
-        List<RsEventPo> all = rsEventRepository.findAll();
-        assertNotNull(all);
-        assertEquals(1,all.size());
-        assertEquals("猪肉涨价了",all.get(0).getEventName());
-        assertEquals("经济",all.get(0).getKeyWord());
-        assertEquals(userPo.getId(),all.get(0).getUserPo().getId());
-
-    }
 
     @Test
     public void should_throw_exception_add_rs_event_list_when_user_not_exist() throws Exception {
@@ -185,6 +173,41 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list/?start=2&end=1"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid request param")));
+    }
+
+    @Test
+    public void should_add_rs_event_list_when_user_exist() throws Exception {
+        RsEvent rsEvent = RsEvent.builder().eventName("猪肉涨价了").keyWord("经济").userId(userPo.getId()).build();
+        String jsonString = objectMapper.writeValueAsString(rsEvent);
+
+        mockMvc.perform(post("/rs/event").content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        List<RsEventPo> all = rsEventRepository.findAll();
+        assertNotNull(all);
+        assertEquals(1,all.size());
+        assertEquals("猪肉涨价了",all.get(0).getEventName());
+        assertEquals("经济",all.get(0).getKeyWord());
+        assertEquals(userPo.getId(),all.get(0).getUserPo().getId());
+
+    }
+
+    @Test
+    public void should_vote_to_rs_event() throws  Exception{
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).voteNum(5).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        Vote vote = Vote.builder()
+                .rsEventId(savedRsEventPo.getId())
+                .userId(userPo.getId())
+                .voteNum(3)
+                .localDateTime(LocalDateTime.now())
+                .build();
+        String jsonString = objectMapper.writeValueAsString(vote);
+        mockMvc.perform(post("/rs/vote/{rsEventId}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isOk());
+
+        assertEquals(8,savedRsEventPo.getVoteNum());
+        assertEquals(7,userPo.getVoteNumber());
     }
 
 }

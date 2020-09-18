@@ -2,12 +2,15 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.po.RsEventPo;
 import com.thoughtworks.rslist.po.UserPo;
+import com.thoughtworks.rslist.po.VotePo;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +34,8 @@ public class RsController {
   RsEventRepository rsEventRepository;
   @Autowired
   UserRepository userRepository;
-
+  @Autowired
+  VoteRepository voteRepository;
 
   @GetMapping("/rs/{id}")
   public ResponseEntity getOneList(@PathVariable int id){
@@ -96,6 +100,25 @@ public class RsController {
                                     .userPo(userPo).build();
     rsEventRepository.save(rsEventPo);
     return ResponseEntity.created(null).build();
+  }
+
+  @PostMapping("/rs/vote/{rsEventId}")
+  public ResponseEntity voteRsEvent(@PathVariable int rsEventId,@RequestBody  Vote vote){
+    int voteNum = vote.getVoteNum();
+    UserPo userPo = userRepository.findById(vote.getUserId()).get();
+//    if()
+    RsEventPo rsEventPo = rsEventRepository.findById(rsEventId).get();
+    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
+    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
+    VotePo votePo = VotePo.builder().voteNum(voteNum)
+            .userPo(userPo)
+            .rsEventPo(rsEventPo)
+            .localDateTime(vote.getLocalDateTime())
+            .build();
+    rsEventRepository.save(rsEventPo);
+    userRepository.save(userPo);
+    voteRepository.save(votePo);
+    return ResponseEntity.ok(null);
   }
 
   @PatchMapping("/rs/{eventId}")
