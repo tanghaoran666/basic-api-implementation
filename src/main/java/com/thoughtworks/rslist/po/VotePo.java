@@ -19,7 +19,6 @@ public class VotePo {
     @Id
     @GeneratedValue
     private int id;
-
     private LocalDateTime localDateTime;
     private int voteNum;
     @ManyToOne

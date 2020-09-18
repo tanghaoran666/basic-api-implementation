@@ -10,4 +10,6 @@ import java.util.List;
 public interface VoteRepository extends CrudRepository<VotePo,Integer> {
     @Override
     List<VotePo> findAll();
+
+    List<VotePo> findAllByUserPoIdAndRsEventPoId(int userId, int rsEventId);
 }

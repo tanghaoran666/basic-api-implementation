@@ -102,24 +102,7 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PostMapping("/rs/vote/{rsEventId}")
-  public ResponseEntity voteRsEvent(@PathVariable int rsEventId,@RequestBody  Vote vote){
-    int voteNum = vote.getVoteNum();
-    UserPo userPo = userRepository.findById(vote.getUserId()).get();
-//    if()
-    RsEventPo rsEventPo = rsEventRepository.findById(rsEventId).get();
-    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
-    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
-    VotePo votePo = VotePo.builder().voteNum(voteNum)
-            .userPo(userPo)
-            .rsEventPo(rsEventPo)
-            .localDateTime(vote.getLocalDateTime())
-            .build();
-    rsEventRepository.save(rsEventPo);
-    userRepository.save(userPo);
-    voteRepository.save(votePo);
-    return ResponseEntity.ok(null);
-  }
+
 
   @PatchMapping("/rs/{eventId}")
   public ResponseEntity patchListViaBody(@PathVariable int eventId,@RequestBody RsEvent rsEvent){
@@ -155,4 +138,22 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
+  @PostMapping("/rs/vote/{rsEventId}")
+  public ResponseEntity voteRsEvent(@PathVariable int rsEventId,@RequestBody Vote vote){
+    int voteNum = vote.getVoteNum();
+    UserPo userPo = userRepository.findById(vote.getUserId()).get();
+//    if()
+    RsEventPo rsEventPo = rsEventRepository.findById(rsEventId).get();
+    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
+    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
+    VotePo votePo = VotePo.builder().voteNum(voteNum)
+            .userPo(userPo)
+            .rsEventPo(rsEventPo)
+            .localDateTime(vote.getLocalDateTime())
+            .build();
+    rsEventRepository.save(rsEventPo);
+    userRepository.save(userPo);
+    voteRepository.save(votePo);
+    return ResponseEntity.ok(null);
+  }
 }
