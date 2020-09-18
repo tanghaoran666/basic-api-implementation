@@ -143,9 +143,7 @@ class RsControllerTest {
 
     @Test
     public void should_throw_exception_change_rs_event_list_when_uerid_not_match()throws Exception{
-        UserPo userPo = UserPo.builder().phone("18888888888").name("改事件").gender("male").email("a@b.com").age(18).voteNumber(10).build();
-        UserPo savedUserPo = userRepository.save(userPo);
-        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(savedUserPo).build();
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100,savedRsEventPo.getId(),10));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
@@ -154,9 +152,11 @@ class RsControllerTest {
 
     @Test
     public void should_get_all_user() throws Exception {
+
+
         mockMvc.perform(get("/users"))
                 .andExpect(jsonPath("$[0].name",is("thr")))
-                .andExpect(jsonPath("$[0].age",is(19)))
+                .andExpect(jsonPath("$[0].age",is(18)))
                 .andExpect(jsonPath("$[0].gender",is("male")))
                 .andExpect(jsonPath("$[0].email",is("a@b.com")))
                 .andExpect(jsonPath("$[0].phone",is("18888888888")))

@@ -60,7 +60,17 @@ public class RsController {
 
   @GetMapping("/users")
   public ResponseEntity getUserList(){
-    return ResponseEntity.ok(rsEventRepository.findAll());
+    List<User> users = userRepository.findAll().stream().map(
+            item -> User.builder()
+                    .voteNumber(item.getVoteNumber())
+                    .phone(item.getPhone())
+                    .name(item.getName())
+                    .gender(item.getGender())
+                    .email(item.getEmail())
+                    .age(item.getAge())
+                    .build()
+    ).collect(Collectors.toList());
+    return ResponseEntity.ok(users);
   }
 
   @PostMapping("/rs/event")
