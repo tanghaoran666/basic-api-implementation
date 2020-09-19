@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,8 +37,10 @@ public class VoteController {
     }
 
     @GetMapping("/voteRecord/byTime")
-    public ResponseEntity<List<Vote>> getVoteRecordByTime(@RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, @RequestParam int pageIndex){
-        Pageable pageable = PageRequest.of(pageIndex-1,5);
+    public ResponseEntity<List<Vote>> getVoteRecordByTime(@RequestParam String startTimeString, @RequestParam String endTimeString){
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startTime = LocalDateTime.parse(startTimeString,df);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeString,df);
         List<Vote> votes = voteRepository.findAll().stream().map(
                 item -> Vote.builder().userId(item.getUser().getId())
                         .localDateTime(item.getLocalDateTime())
@@ -45,13 +48,13 @@ public class VoteController {
                         .rsEventId(item.getRsEvent().getId())
                         .build()
         ).collect(Collectors.toList());
-        List<Vote> votesByTime = new ArrayList();
-        for (Vote vote : votes) {
-            if(vote.getLocalDateTime().isAfter(startTime)&&vote.getLocalDateTime().isBefore(endTime)){
-                votesByTime.add(vote);
-            }
-        }
-        return ResponseEntity.ok(votesByTime);
+
+        List<Vote> voteInTime = votes.stream().filter(
+                item -> item.getLocalDateTime().isBefore(endTime) && item.getLocalDateTime().isAfter(startTime)
+        ).collect(Collectors.toList());
+        return ResponseEntity.ok(voteInTime);
 
     }
+
+
 }

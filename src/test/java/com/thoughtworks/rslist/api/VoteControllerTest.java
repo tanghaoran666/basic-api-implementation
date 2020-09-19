@@ -15,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -91,10 +93,12 @@ class VoteControllerTest {
 
     @Test
     public void should_get_vote_record_between_start_time_and_end_time() throws Exception{
-        LocalDateTime startTime = LocalDateTime.of(2020,9,19,11,10);
-        LocalDateTime endTime = LocalDateTime.of(2020,9,19,13,10);
-
-        for (int i = 0; i < 8; i++) {
+        LocalDateTime startTime = LocalDateTime.of(2020,9,19,14,10,00);
+        LocalDateTime endTime = LocalDateTime.of(2020,9,19,15,45,00);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startTimeString = df.format(startTime);
+        String endTimeString = df.format(endTime);
+        for (int i = 0; i < 5; i++) {
             VotePo votePo = VotePo.builder()
                     .localDateTime(LocalDateTime.now())
                     .rsEvent(rsEventPo)
@@ -103,10 +107,19 @@ class VoteControllerTest {
                     .build();
             voteRepository.save(votePo);
         }
+        TimeUnit.MINUTES.sleep(2);
 
-        mockMvc.perform(get("/voteRecord/byTime/").param("startTime",String.valueOf(startTime))
-                .param("endTime",String.valueOf(endTime))
-                .param("pageIndex","1"))
+        for (int i = 0; i < 3; i++) {
+            VotePo votePo = VotePo.builder()
+                    .localDateTime(LocalDateTime.now())
+                    .rsEvent(rsEventPo)
+                    .user(userPo)
+                    .voteNum(i+1)
+                    .build();
+            voteRepository.save(votePo);
+        }
+        mockMvc.perform(get("/voteRecord/byTime/").param("startTimeString",startTimeString)
+                .param("endTimeString",endTimeString))
                 .andExpect(jsonPath("$",hasSize(5)))
                 .andExpect(jsonPath("$[0].userId",is(userPo.getId())))
                 .andExpect(jsonPath("$[0].rsEventId",is(rsEventPo.getId())))

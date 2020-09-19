@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface VoteRepository extends PagingAndSortingRepository<VotePo,Integer> {
@@ -16,4 +17,7 @@ public interface VoteRepository extends PagingAndSortingRepository<VotePo,Intege
 
     @Query("select v from VotePo v where v.user.id = :userId and v.rsEvent.id = :rsEventId")
     List<VotePo> findAccordingToUserAndRsEvent(int userId, int rsEventId, Pageable pageable);
+
+//    @Query("select v from VotePo v where v.localDateTime.isBefore(endTime) and v.localDateTime.isAfter(startTime)")
+//    List<VotePo> findAccordingToStartTimeAndStopTime(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 }
