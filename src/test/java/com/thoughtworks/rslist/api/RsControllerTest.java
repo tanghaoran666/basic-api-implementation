@@ -224,7 +224,24 @@ class RsControllerTest {
         mockMvc
                 .perform(post("/rs/vote/{eventId}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid vote number")));
+                .andExpect(jsonPath("$.error",is("invalid vote param")));
+
+    }
+
+    @Test
+    public void should_throw_exception_when_vote_id_invalid() throws  Exception{
+
+        RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).voteNum(5).build();
+        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        Vote vote = Vote.builder()
+                .userId(userPo.getId())
+                .voteNum(5)
+                .build();
+        String jsonString = objectMapper.writeValueAsString(vote);
+        mockMvc
+                .perform(post("/rs/vote/{eventId}",100).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid vote param")));
 
     }
 

@@ -11,6 +11,7 @@ import com.thoughtworks.rslist.po.VotePo;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
+import com.thoughtworks.rslist.service.RsService;
 import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,8 @@ import java.util.stream.Collectors;
 
 public class RsController {
 
+  @Autowired
+  RsService rsService;
   @Autowired
   RsEventRepository rsEventRepository;
   @Autowired
@@ -139,24 +142,25 @@ public class RsController {
 
   @PostMapping("/rs/vote/{eventId}")
   public ResponseEntity voteRsEvent(@PathVariable int eventId, @RequestBody  Vote vote){
-    vote.setRsEventId(eventId);
-    vote.setLocalDateTime(LocalDateTime.now());
-    int voteNum = vote.getVoteNum();
-    UserPo userPo = userRepository.findById(vote.getUserId()).get();
-    if(voteNum>userPo.getVoteNumber()){
-      throw new RsEventNotValidException("invalid vote number");
-    }
-    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
-    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
-    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
-    VotePo votePo = VotePo.builder().voteNum(voteNum)
-            .user(userPo)
-            .rsEvent(rsEventPo)
-            .localDateTime(vote.getLocalDateTime())
-            .build();
-    rsEventRepository.save(rsEventPo);
-    userRepository.save(userPo);
-    voteRepository.save(votePo);
+//    vote.setRsEventId(eventId);
+//    vote.setLocalDateTime(LocalDateTime.now());
+//    int voteNum = vote.getVoteNum();
+//    UserPo userPo = userRepository.findById(vote.getUserId()).get();
+//    if(voteNum>userPo.getVoteNumber()){
+//      throw new RsEventNotValidException("invalid vote number");
+//    }
+//    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
+//    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
+//    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
+//    VotePo votePo = VotePo.builder().voteNum(voteNum)
+//            .user(userPo)
+//            .rsEvent(rsEventPo)
+//            .localDateTime(vote.getLocalDateTime())
+//            .build();
+//    rsEventRepository.save(rsEventPo);
+//    userRepository.save(userPo);
+//    voteRepository.save(votePo);
+    rsService.vote(vote,eventId);
     return ResponseEntity.ok(null);
   }
 }
