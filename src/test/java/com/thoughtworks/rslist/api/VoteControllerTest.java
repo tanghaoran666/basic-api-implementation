@@ -64,7 +64,7 @@ class VoteControllerTest {
         }
 
 
-        mockMvc.perform(get("/voteRecord/").param("userId",String.valueOf(userPo.getId()))
+        mockMvc.perform(get("/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
         .param("rsEventId",String.valueOf(rsEventPo.getId()))
         .param("pageIndex","1"))
                 .andExpect(jsonPath("$",hasSize(5)))
@@ -77,7 +77,7 @@ class VoteControllerTest {
                 .andExpect(jsonPath("$[4].voteNum",is(5)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/voteRecord/").param("userId",String.valueOf(userPo.getId()))
+        mockMvc.perform(get("/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
                 .param("rsEventId",String.valueOf(rsEventPo.getId()))
                 .param("pageIndex","2"))
                 .andExpect(jsonPath("$",hasSize(3)))
@@ -86,6 +86,35 @@ class VoteControllerTest {
                 .andExpect(jsonPath("$[0].voteNum",is(6)))
                 .andExpect(jsonPath("$[1].voteNum",is(7)))
                 .andExpect(jsonPath("$[2].voteNum",is(8)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void should_get_vote_record_between_start_time_and_end_time() throws Exception{
+        LocalDateTime startTime = LocalDateTime.of(2020,9,19,11,10);
+        LocalDateTime endTime = LocalDateTime.of(2020,9,19,13,10);
+
+        for (int i = 0; i < 8; i++) {
+            VotePo votePo = VotePo.builder()
+                    .localDateTime(LocalDateTime.now())
+                    .rsEvent(rsEventPo)
+                    .user(userPo)
+                    .voteNum(i+1)
+                    .build();
+            voteRepository.save(votePo);
+        }
+
+        mockMvc.perform(get("/voteRecord/byTime/").param("startTime",String.valueOf(startTime))
+                .param("endTime",String.valueOf(endTime))
+                .param("pageIndex","1"))
+                .andExpect(jsonPath("$",hasSize(5)))
+                .andExpect(jsonPath("$[0].userId",is(userPo.getId())))
+                .andExpect(jsonPath("$[0].rsEventId",is(rsEventPo.getId())))
+                .andExpect(jsonPath("$[0].voteNum",is(1)))
+                .andExpect(jsonPath("$[1].voteNum",is(2)))
+                .andExpect(jsonPath("$[2].voteNum",is(3)))
+                .andExpect(jsonPath("$[3].voteNum",is(4)))
+                .andExpect(jsonPath("$[4].voteNum",is(5)))
                 .andExpect(status().isOk());
     }
 
