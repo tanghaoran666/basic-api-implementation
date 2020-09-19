@@ -11,6 +11,7 @@ import com.thoughtworks.rslist.po.RsEventPo;
 import com.thoughtworks.rslist.po.UserPo;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +37,17 @@ class RsControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+    @Autowired
+    VoteRepository voteRepository;
 
     ObjectMapper objectMapper;
     UserPo userPo;
 
     @BeforeEach
     void setUp() throws Exception {
-        userRepository.deleteAll();
+        voteRepository.deleteAll();
         rsEventRepository.deleteAll();
+        userRepository.deleteAll();
         objectMapper = new ObjectMapper();
         userPo = UserPo.builder().phone("18888888888").name("thr").gender("male").email("a@b.com").age(18).voteNumber(10).build();
         userPo = userRepository.save(userPo);
@@ -200,14 +204,13 @@ class RsControllerTest {
                 .rsEventId(savedRsEventPo.getId())
                 .userId(userPo.getId())
                 .voteNum(3)
-                .localDateTime(LocalDateTime.now())
                 .build();
         String jsonString = objectMapper.writeValueAsString(vote);
-        mockMvc.perform(post("/rs/vote/{rsEventId}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/rs/vote",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        assertEquals(8,savedRsEventPo.getVoteNum());
-        assertEquals(7,userPo.getVoteNumber());
+        assertEquals(8,rsEventRepository.findById(savedRsEventPo.getId()).get().getVoteNum());
+        assertEquals(7,userRepository.findById(userPo.getId()).get().getVoteNumber());
     }
 
 }
