@@ -93,11 +93,12 @@ class VoteControllerTest {
 
     @Test
     public void should_get_vote_record_between_start_time_and_end_time() throws Exception{
-        LocalDateTime startTime = LocalDateTime.of(2020,9,19,14,10,00);
-        LocalDateTime endTime = LocalDateTime.of(2020,9,19,15,45,00);
+        LocalDateTime startTime = LocalDateTime.now();
+        LocalDateTime endTime = startTime.plusMinutes(1);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String startTimeString = df.format(startTime);
         String endTimeString = df.format(endTime);
+        TimeUnit.SECONDS.sleep(1);
         for (int i = 0; i < 5; i++) {
             VotePo votePo = VotePo.builder()
                     .localDateTime(LocalDateTime.now())
@@ -107,7 +108,7 @@ class VoteControllerTest {
                     .build();
             voteRepository.save(votePo);
         }
-        TimeUnit.MINUTES.sleep(2);
+        TimeUnit.MINUTES.sleep(1);
 
         for (int i = 0; i < 3; i++) {
             VotePo votePo = VotePo.builder()
