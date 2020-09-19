@@ -31,6 +31,4 @@ public class RsEventPo {
     @ManyToOne
     private UserPo userPo;
 
-    @OneToMany(mappedBy = "rsEventPo")
-    private List<VotePo> votePos;
 }

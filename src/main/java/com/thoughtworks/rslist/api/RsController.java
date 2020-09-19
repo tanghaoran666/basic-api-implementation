@@ -103,29 +103,6 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PostMapping("/rs/vote/{eventId}")
-  public ResponseEntity voteRsEvent(@PathVariable int eventId, @RequestBody  Vote vote){
-    vote.setRsEventId(eventId);
-    vote.setLocalDateTime(LocalDateTime.now());
-    int voteNum = vote.getVoteNum();
-    UserPo userPo = userRepository.findById(vote.getUserId()).get();
-    if(voteNum > userPo.getVoteNumber()){
-      throw new RsEventNotValidException("invalid vote number");
-    }
-    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
-    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
-    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
-    VotePo votePo = VotePo.builder().voteNum(voteNum)
-            .userPo(userPo)
-            .rsEventPo(rsEventPo)
-            .localDateTime(vote.getLocalDateTime())
-            .build();
-    rsEventRepository.save(rsEventPo);
-    userRepository.save(userPo);
-    voteRepository.save(votePo);
-    return ResponseEntity.ok(null);
-  }
-
   @PatchMapping("/rs/{eventId}")
   public ResponseEntity patchListViaBody(@PathVariable int eventId,@RequestBody RsEvent rsEvent){
     if(!rsEventRepository.findById(eventId).isPresent()){
@@ -160,4 +137,26 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
+  @PostMapping("/rs/vote/{eventId}")
+  public ResponseEntity voteRsEvent(@PathVariable int eventId, @RequestBody  Vote vote){
+    vote.setRsEventId(eventId);
+    vote.setLocalDateTime(LocalDateTime.now());
+    int voteNum = vote.getVoteNum();
+    UserPo userPo = userRepository.findById(vote.getUserId()).get();
+    if(voteNum>userPo.getVoteNumber()){
+      throw new RsEventNotValidException("invalid vote number");
+    }
+    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
+    userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
+    rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
+    VotePo votePo = VotePo.builder().voteNum(voteNum)
+            .user(userPo)
+            .rsEvent(rsEventPo)
+            .localDateTime(vote.getLocalDateTime())
+            .build();
+    rsEventRepository.save(rsEventPo);
+    userRepository.save(userPo);
+    voteRepository.save(votePo);
+    return ResponseEntity.ok(null);
+  }
 }
