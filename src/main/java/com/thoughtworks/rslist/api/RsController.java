@@ -137,13 +137,14 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
-  @PostMapping("/rs/vote")
-  public ResponseEntity voteRsEvent(@RequestBody  Vote vote){
+  @PostMapping("/rs/vote/{eventId}")
+  public ResponseEntity voteRsEvent(@PathVariable int eventId, @RequestBody  Vote vote){
+    vote.setRsEventId(eventId);
     vote.setLocalDateTime(LocalDateTime.now());
     int voteNum = vote.getVoteNum();
     UserPo userPo = userRepository.findById(vote.getUserId()).get();
 //    if()
-    RsEventPo rsEventPo = rsEventRepository.findById(vote.getRsEventId()).get();
+    RsEventPo rsEventPo = rsEventRepository.findById(eventId).get();
     userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
     rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
     VotePo votePo = VotePo.builder().voteNum(voteNum)

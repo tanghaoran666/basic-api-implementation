@@ -201,12 +201,11 @@ class RsControllerTest {
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).voteNum(5).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         Vote vote = Vote.builder()
-                .rsEventId(savedRsEventPo.getId())
                 .userId(userPo.getId())
                 .voteNum(3)
                 .build();
         String jsonString = objectMapper.writeValueAsString(vote);
-        mockMvc.perform(post("/rs/vote",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/rs/vote/{eventId}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
         assertEquals(8,rsEventRepository.findById(savedRsEventPo.getId()).get().getVoteNum());
