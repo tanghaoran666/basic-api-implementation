@@ -22,7 +22,7 @@ public class VoteController {
     @Autowired
     VoteRepository voteRepository;
 
-    @GetMapping("/voteRecord/byId")
+    @GetMapping("/rs/voteRecord/byId")
     public ResponseEntity<List<Vote>> getVoteRecordById(@RequestParam Integer userId,@RequestParam Integer rsEventId,@RequestParam int pageIndex){
         Pageable pageable = PageRequest.of(pageIndex-1,5);
         List<Vote> votes = voteRepository.findAccordingToUserAndRsEvent(userId, rsEventId,pageable).stream().map(
@@ -36,7 +36,7 @@ public class VoteController {
 
     }
 
-    @GetMapping("/voteRecord/byTime")
+    @GetMapping("/rs/voteRecord/byTime")
     public ResponseEntity<List<Vote>> getVoteRecordByTime(@RequestParam String startTimeString, @RequestParam String endTimeString){
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(startTimeString,df);

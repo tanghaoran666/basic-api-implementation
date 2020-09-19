@@ -66,7 +66,7 @@ class VoteControllerTest {
         }
 
 
-        mockMvc.perform(get("/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
+        mockMvc.perform(get("/rs/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
         .param("rsEventId",String.valueOf(rsEventPo.getId()))
         .param("pageIndex","1"))
                 .andExpect(jsonPath("$",hasSize(5)))
@@ -79,7 +79,7 @@ class VoteControllerTest {
                 .andExpect(jsonPath("$[4].voteNum",is(5)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
+        mockMvc.perform(get("/rs/voteRecord/byId/").param("userId",String.valueOf(userPo.getId()))
                 .param("rsEventId",String.valueOf(rsEventPo.getId()))
                 .param("pageIndex","2"))
                 .andExpect(jsonPath("$",hasSize(3)))
@@ -119,7 +119,7 @@ class VoteControllerTest {
                     .build();
             voteRepository.save(votePo);
         }
-        mockMvc.perform(get("/voteRecord/byTime/").param("startTimeString",startTimeString)
+        mockMvc.perform(get("/rs/voteRecord/byTime/").param("startTimeString",startTimeString)
                 .param("endTimeString",endTimeString))
                 .andExpect(jsonPath("$",hasSize(5)))
                 .andExpect(jsonPath("$[0].userId",is(userPo.getId())))

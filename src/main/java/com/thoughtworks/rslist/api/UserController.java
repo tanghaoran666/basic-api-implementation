@@ -21,18 +21,18 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/user")
+    @PostMapping("/rs/user")
     public void add_user_list(@RequestBody @Valid UserPo userPo){
         userRepository.save(userPo);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/rs/user/{id}")
     public ResponseEntity get_user_in_database(@PathVariable int id){
         UserPo userPo = userRepository.findOneById(id);
         return ResponseEntity.ok(userPo);
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/rs/user/{id}")
     public ResponseEntity delete_user_in_database(@PathVariable int id){
         userRepository.deleteById(id);
         return ResponseEntity.ok(null);

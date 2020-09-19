@@ -58,7 +58,7 @@ class RsControllerTest {
 
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        mockMvc.perform(get("/rs/list"))
+        mockMvc.perform(get("/rs/events"))
                 .andExpect(jsonPath("$",hasSize(1)))
                 .andExpect(jsonPath("$[0].eventName",is("美国山火")))
                 .andExpect(jsonPath("$[0].keyWord",is("国际")))
@@ -72,7 +72,7 @@ class RsControllerTest {
         RsEventPo rsEventPo2 = RsEventPo.builder().eventName("第二条事件").keyWord("无参数").userPo(userPo).build();
         RsEventPo savedRsEventPo2 = rsEventRepository.save(rsEventPo2);
 
-        mockMvc.perform(get("/rs/list/?start=1&end=2"))
+        mockMvc.perform(get("/rs/events/?start=1&end=2"))
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无参数")))
@@ -88,11 +88,11 @@ class RsControllerTest {
         RsEventPo rsEventPo2 = RsEventPo.builder().eventName("第二条事件").keyWord("无参数").userPo(userPo).build();
         RsEventPo savedRsEventPo2 = rsEventRepository.save(rsEventPo2);
 
-        mockMvc.perform(get("/rs/{id}",savedRsEventPo1.getId()))
+        mockMvc.perform(get("/rs/event/{id}",savedRsEventPo1.getId()))
                 .andExpect(jsonPath("$.eventName",is("第一条事件")))
                 .andExpect(jsonPath("$.keyWord",is("无参数")))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/rs/{id}",savedRsEventPo2.getId()))
+        mockMvc.perform(get("/rs/event/{id}",savedRsEventPo2.getId()))
                 .andExpect(jsonPath("$.eventName",is("第二条事件")))
                 .andExpect(jsonPath("$.keyWord",is("无参数")))
                 .andExpect(status().isOk());
@@ -116,7 +116,7 @@ class RsControllerTest {
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         assertEquals(1,rsEventRepository.findAll().size());
-        mockMvc.perform(delete("/rs/{id}",savedRsEventPo.getId())).andExpect(status().isOk());
+        mockMvc.perform(delete("/rs/event/{id}",savedRsEventPo.getId())).andExpect(status().isOk());
         assertEquals(0,rsEventRepository.findAll().size());
 
 
@@ -127,7 +127,7 @@ class RsControllerTest {
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId(),savedRsEventPo.getId(),5));
-        mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         RsEventPo rsEventPoChanged = rsEventRepository.findById(savedRsEventPo.getId()).get();
         assertEquals("改过的美国山火",rsEventPoChanged.getEventName());
@@ -140,7 +140,7 @@ class RsControllerTest {
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
         String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100,savedRsEventPo.getId(),10));
-        mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/event/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -148,7 +148,7 @@ class RsControllerTest {
     public void should_get_all_user() throws Exception {
 
 
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/rs/users"))
                 .andExpect(jsonPath("$[0].name",is("thr")))
                 .andExpect(jsonPath("$[0].age",is(18)))
                 .andExpect(jsonPath("$[0].gender",is("male")))
@@ -159,7 +159,7 @@ class RsControllerTest {
 
     @Test
     public void should_throw_exceptin_when_index_out_of_range() throws Exception {
-        mockMvc.perform(get("/rs/0"))
+        mockMvc.perform(get("/rs/event/0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid id")));
 
@@ -168,13 +168,13 @@ class RsControllerTest {
 
     @Test
     public void should_throw_exception_when_given_not_valid_request_param() throws Exception {
-        mockMvc.perform(get("/rs/list/?start=0&end=2"))
+        mockMvc.perform(get("/rs/events/?start=0&end=2"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid request param")));
-        mockMvc.perform(get("/rs/list/?start=1&end=5"))
+        mockMvc.perform(get("/rs/events/?start=1&end=5"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid request param")));
-        mockMvc.perform(get("/rs/list/?start=2&end=1"))
+        mockMvc.perform(get("/rs/events/?start=2&end=1"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid request param")));
     }

@@ -38,7 +38,7 @@ public class RsController {
   @Autowired
   VoteRepository voteRepository;
 
-  @GetMapping("/rs/{id}")
+  @GetMapping("/rs/event/{id}")
   public ResponseEntity getOneList(@PathVariable int id){
     Optional<RsEventPo> existPo = rsEventRepository.findById(id);
     if(!existPo.isPresent()){
@@ -55,7 +55,7 @@ public class RsController {
     return ResponseEntity.ok(rsEvent);
   }
 
-  @GetMapping("/rs/list")
+  @GetMapping("/rs/events")
   public ResponseEntity getBetweenList(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     List<RsEvent> rsEvents = rsEventRepository.findAll().stream().map(
             item -> RsEvent.builder().keyWord(item.getKeyWord())
@@ -73,7 +73,7 @@ public class RsController {
     return ResponseEntity.ok(rsEvents.subList(start-1 , end));
   }
 
-  @GetMapping("/users")
+  @GetMapping("/rs/users")
   public ResponseEntity getUserList(){
     List<User> users = userRepository.findAll().stream().map(
             item -> User.builder()
@@ -103,7 +103,7 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PatchMapping("/rs/{eventId}")
+  @PatchMapping("/rs/event/{eventId}")
   public ResponseEntity patchListViaBody(@PathVariable int eventId,@RequestBody RsEvent rsEvent){
     if(!rsEventRepository.findById(eventId).isPresent()){
       return ResponseEntity.badRequest().build();
@@ -124,18 +124,13 @@ public class RsController {
     return ResponseEntity.ok(null);
   }
 
-  @DeleteMapping("/rs/{id}")
+  @DeleteMapping("/rs/event/{id}")
   public ResponseEntity deleteList(@PathVariable int id){
 
     rsEventRepository.deleteById(id);
     return ResponseEntity.ok(null);
   }
 
-  @DeleteMapping("/rs/reStart")
-  public ResponseEntity reStart(){
-    rsEventRepository.deleteAll();
-    return ResponseEntity.ok(null);
-  }
 
   @PostMapping("/rs/vote/{eventId}")
   public ResponseEntity voteRsEvent(@PathVariable int eventId, @RequestBody  Vote vote){
