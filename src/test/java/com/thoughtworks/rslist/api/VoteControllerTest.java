@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,18 +54,20 @@ class VoteControllerTest {
     public void should_get_vote_record() throws Exception{
         VotePo votePo = VotePo.builder()
                 .localDateTime(LocalDateTime.now())
-                .rsEventPo(rsEventPo)
-                .userPo(userPo)
+                .rsEvent(rsEventPo)
+                .user(userPo)
                 .voteNum(5)
                 .build();
         voteRepository.save(votePo);
-
-        mockMvc.perform(get("/voteRecord").param("userId",String.valueOf(userPo.getId()))
-        .param("rsEventId",String.valueOf(rsEventPo.getId())))
+        String rsEventString = String.valueOf(rsEventPo.getId());
+        String userString = String.valueOf(userPo.getId());
+        mockMvc.perform(get("/voteRecord/").param("userId",userString)
+        .param("rsEventId",rsEventString))
                 .andExpect(jsonPath("$",hasSize(1)))
                 .andExpect(jsonPath("$[0].userId",is(userPo.getId())))
                 .andExpect(jsonPath("$[0].rsEventId",is(rsEventPo.getId())))
-                .andExpect(jsonPath("$[0].voteNum",is(5)));
+                .andExpect(jsonPath("$[0].voteNum",is(5)))
+                .andExpect(status().isOk());
     }
 
 }

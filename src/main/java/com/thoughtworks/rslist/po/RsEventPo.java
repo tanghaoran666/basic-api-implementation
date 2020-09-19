@@ -30,4 +30,5 @@ public class RsEventPo {
     private int voteNum;
     @ManyToOne
     private UserPo userPo;
+
 }

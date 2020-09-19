@@ -23,11 +23,11 @@ public class VotePo {
     private int voteNum;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserPo userPo;
+    private UserPo user;
 
     @ManyToOne
     @JoinColumn(name = "rs_event_id")
-    private RsEventPo rsEventPo;
+    private RsEventPo rsEvent;
 
 
 }

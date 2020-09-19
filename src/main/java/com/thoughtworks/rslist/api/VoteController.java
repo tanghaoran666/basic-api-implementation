@@ -17,12 +17,12 @@ public class VoteController {
     VoteRepository voteRepository;
 
     @GetMapping("/voteRecord")
-    public ResponseEntity<List<Vote>> getVoteRecord(@RequestParam int userID,@RequestParam int rsEventId){
-        List<Vote> votes = voteRepository.findAllByUserPoIdAndRsEventPoId(userID, rsEventId).stream().map(
-                item -> Vote.builder().userId(item.getUserPo().getId())
+    public ResponseEntity<List<Vote>> getVoteRecord(@RequestParam Integer userId,@RequestParam Integer rsEventId){
+        List<Vote> votes = voteRepository.findAccordingToUserAndRsEvent(userId, rsEventId).stream().map(
+                item -> Vote.builder().userId(item.getUser().getId())
                         .localDateTime(item.getLocalDateTime())
                         .voteNum(item.getVoteNum())
-                        .rsEventId(item.getRsEventPo().getId())
+                        .rsEventId(item.getRsEvent().getId())
                         .build()
         ).collect(Collectors.toList());
         return ResponseEntity.ok(votes);

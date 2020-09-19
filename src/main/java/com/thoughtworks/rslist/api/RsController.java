@@ -147,8 +147,8 @@ public class RsController {
     userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
     rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
     VotePo votePo = VotePo.builder().voteNum(voteNum)
-            .userPo(userPo)
-            .rsEventPo(rsEventPo)
+            .user(userPo)
+            .rsEvent(rsEventPo)
             .localDateTime(vote.getLocalDateTime())
             .build();
     rsEventRepository.save(rsEventPo);
