@@ -20,6 +20,7 @@ import lombok.Data;
 
 import javax.validation.Valid;
 import javax.xml.soap.SAAJResult;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -102,12 +103,13 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @PostMapping("/rs/vote/{rsEventId}")
-  public ResponseEntity voteRsEvent(@PathVariable int rsEventId,@RequestBody  Vote vote){
+  @PostMapping("/rs/vote")
+  public ResponseEntity voteRsEvent(@RequestBody  Vote vote){
+    vote.setLocalDateTime(LocalDateTime.now());
     int voteNum = vote.getVoteNum();
     UserPo userPo = userRepository.findById(vote.getUserId()).get();
 //    if()
-    RsEventPo rsEventPo = rsEventRepository.findById(rsEventId).get();
+    RsEventPo rsEventPo = rsEventRepository.findById(vote.getRsEventId()).get();
     userPo.setVoteNumber(userPo.getVoteNumber() - voteNum);
     rsEventPo.setVoteNum(rsEventPo.getVoteNum() + voteNum);
     VotePo votePo = VotePo.builder().voteNum(voteNum)

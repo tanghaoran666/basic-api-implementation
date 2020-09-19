@@ -200,14 +200,13 @@ class RsControllerTest {
                 .rsEventId(savedRsEventPo.getId())
                 .userId(userPo.getId())
                 .voteNum(3)
-                .localDateTime(LocalDateTime.now())
                 .build();
         String jsonString = objectMapper.writeValueAsString(vote);
-        mockMvc.perform(post("/rs/vote/{rsEventId}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/rs/vote",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON)
         ).andExpect(status().isOk());
 
-        assertEquals(8,savedRsEventPo.getVoteNum());
-        assertEquals(7,userPo.getVoteNumber());
+        assertEquals(8,rsEventRepository.findById(savedRsEventPo.getId()).get().getVoteNum());
+        assertEquals(7,userRepository.findById(userPo.getId()).get().getVoteNumber());
     }
 
 }
