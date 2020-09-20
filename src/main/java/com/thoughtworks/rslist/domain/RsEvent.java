@@ -19,10 +19,7 @@ public class RsEvent {
     private String keyWord;
     @NotNull
     private int userId;
-    @NotNull
-    private  int rsEventId;
-    @NotNull
-    private int voteNum;
+
     public int getUserId() {
         return userId;
     }

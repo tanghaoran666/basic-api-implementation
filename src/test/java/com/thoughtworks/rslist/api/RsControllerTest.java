@@ -57,7 +57,7 @@ class RsControllerTest {
     public void should_get_rs_event_list() throws Exception {
 
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
-        RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
+        rsEventPo = rsEventRepository.save(rsEventPo);
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$",hasSize(1)))
                 .andExpect(jsonPath("$[0].eventName",is("美国山火")))
@@ -126,7 +126,7 @@ class RsControllerTest {
     public void should_change_rs_event_list_via_body()throws Exception{
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId(),savedRsEventPo.getId(),5));
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,userPo.getId()));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         RsEventPo rsEventPoChanged = rsEventRepository.findById(savedRsEventPo.getId()).get();
@@ -139,7 +139,7 @@ class RsControllerTest {
     public void should_throw_exception_change_rs_event_list_when_uerid_not_match()throws Exception{
         RsEventPo rsEventPo = RsEventPo.builder().eventName("美国山火").keyWord("国际").userPo(userPo).build();
         RsEventPo savedRsEventPo = rsEventRepository.save(rsEventPo);
-        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100,savedRsEventPo.getId(),10));
+        String jsonString = objectMapper.writeValueAsString(new RsEvent("改过的美国山火",null,100));
         mockMvc.perform(patch("/rs/{id}",savedRsEventPo.getId()).content(jsonString).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

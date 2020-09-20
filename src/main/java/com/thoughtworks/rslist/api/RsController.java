@@ -1,6 +1,7 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.domain.RsEventReturn;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.exception.Error;
@@ -45,11 +46,10 @@ public class RsController {
       throw new RsEventNotValidException("invalid id");
     }
     RsEventPo rsEventPo = existPo.get();
-    RsEvent rsEvent = RsEvent.builder()
-            .userId(rsEventPo.getId())
+    RsEventReturn rsEvent = RsEventReturn.builder()
             .keyWord(rsEventPo.getKeyWord())
             .eventName(rsEventPo.getEventName())
-            .rsEventId(rsEventPo.getId())
+            .id(rsEventPo.getId())
             .voteNum(rsEventPo.getVoteNum())
             .build();
     return ResponseEntity.ok(rsEvent);
@@ -57,10 +57,10 @@ public class RsController {
 
   @GetMapping("/rs/list")
   public ResponseEntity getBetweenList(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
-    List<RsEvent> rsEvents = rsEventRepository.findAll().stream().map(
-            item -> RsEvent.builder().keyWord(item.getKeyWord())
+    List<RsEventReturn> rsEvents = rsEventRepository.findAll().stream().map(
+            item -> RsEventReturn.builder().keyWord(item.getKeyWord())
                     .eventName(item.getEventName())
-                    .userId(item.getUserPo().getId()).build()
+                    .id(item.getId()).build()
     ).collect(Collectors.toList());
 
 
