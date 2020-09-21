@@ -42,7 +42,7 @@ public class VoteController {
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime startTime = LocalDateTime.parse(startTimeString,df);
         LocalDateTime endTime = LocalDateTime.parse(endTimeString,df);
-        if(startTime.isAfter(endTime) || voteRepository.findAll().size() == 0){
+        if(startTime.isAfter(endTime)){
             throw new RsEventNotValidException("invalid time");
         }
         List<Vote> votes = voteRepository.findAll().stream().map(
@@ -56,6 +56,9 @@ public class VoteController {
         List<Vote> voteInTime = votes.stream().filter(
                 item -> item.getLocalDateTime().isBefore(endTime) && item.getLocalDateTime().isAfter(startTime)
         ).collect(Collectors.toList());
+        if(voteInTime.size()==0){
+            throw new RsEventNotValidException("invalid time");
+        }
         return ResponseEntity.ok(voteInTime);
 
     }

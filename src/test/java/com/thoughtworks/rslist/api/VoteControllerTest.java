@@ -154,4 +154,26 @@ class VoteControllerTest {
                 .andExpect(jsonPath("$.error",is("invalid time")));
     }
 
+    @Test
+    public void should_throw_exception_when_vote_record_not_exist() throws Exception {
+        LocalDateTime startTime = LocalDateTime.of(2020,10,22,12,2,0);
+        LocalDateTime endTime = startTime.plusMinutes(1);;
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String startTimeString = df.format(startTime);
+        String endTimeString = df.format(endTime);
+
+        VotePo votePo = VotePo.builder()
+                .localDateTime(LocalDateTime.now())
+                .rsEvent(rsEventPo)
+                .user(userPo)
+                .voteNum(5)
+                .build();
+        voteRepository.save(votePo);
+
+        mockMvc.perform(get("/voteRecord/byTime/").param("startTimeString",startTimeString)
+                .param("endTimeString",endTimeString))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid time")));
+    }
+
 }
